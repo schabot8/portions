@@ -2,40 +2,49 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Choix de Portions</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
+      padding: 5vw;
+    }
+
+    h1 {
+      font-size: 6vw;
+      text-align: center;
     }
 
     .category {
-      margin-bottom: 30px;
+      margin-bottom: 8vw;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 1vw;
     }
 
     .category h2 {
-      margin-bottom: 10px;
+      font-size: 5vw;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 2vw;
+      margin-bottom: 2vw;
     }
 
     .icon {
-      font-size: 1.4em;
+      font-size: 6vw;
     }
 
     .circle-container {
       display: flex;
-      gap: 15px;
+      gap: 3vw;
       flex-wrap: wrap;
     }
 
     .circle {
-      width: 50px;
-      height: 50px;
+      width: 15vw;
+      height: 15vw;
+      min-width: 50px;
+      min-height: 50px;
       border: 2px solid #888;
       border-radius: 50%;
       position: relative;
@@ -69,47 +78,48 @@
     /* Couleurs par catégorie */
     .proteine.half::before,
     .proteine.full::before {
-      background-color: #e74c3c; /* Rouge */
+      background-color: #e74c3c;
     }
 
     .glucide.half::before,
     .glucide.full::before {
-      background-color: #f5deb3; /* Beige */
+      background-color: #f5deb3;
     }
 
     .lipide.half::before,
     .lipide.full::before {
-      background-color: #f1c40f; /* Jaune */
+      background-color: #f1c40f;
     }
 
     .legume.half::before,
     .legume.full::before {
-      background-color: #2ecc71; /* Vert */
-    }
-
-    #summary {
-      margin-top: 40px;
-      padding: 20px;
-      border-top: 2px solid #ccc;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-right: 10px;
+      background-color: #2ecc71;
     }
 
     .category-summary {
+      font-size: 4vw;
       font-weight: bold;
+      text-align: right;
+      margin-top: 2vw;
+    }
+
+    button {
+      padding: 3vw 6vw;
+      font-size: 5vw;
+      margin-top: 4vw;
+      width: 100%;
+      max-width: 400px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      cursor: pointer;
     }
   </style>
 
   <script>
     function toggleCircleState(element) {
       if (element.classList.contains('full')) {
-        element.classList.remove('full');
-        element.classList.remove('half');
+        element.classList.remove('full', 'half');
       } else if (element.classList.contains('half')) {
         element.classList.remove('half');
         element.classList.add('full');
@@ -122,33 +132,24 @@
 
     function afficherSelections() {
       const categories = document.querySelectorAll('.category');
-      
       categories.forEach(cat => {
         const circles = cat.querySelectorAll('.circle');
         let total = 0;
-
         circles.forEach(c => {
           if (c.classList.contains('half')) total += 0.5;
           if (c.classList.contains('full')) total += 1;
         });
-
-        const summaryElement = cat.querySelector('.category-summary');
-        summaryElement.textContent = `${total} portions`;
+        const summary = cat.querySelector('.category-summary');
+        if (summary) summary.textContent = `${total} portions`;
       });
     }
 
     function saveState() {
       const circles = document.querySelectorAll('.circle');
-      const states = [];
-      circles.forEach(c => {
-        if (c.classList.contains('full')) {
-          states.push('full');
-        } else if (c.classList.contains('half')) {
-          states.push('half');
-        } else {
-          states.push('none');
-        }
-      });
+      const states = Array.from(circles).map(c =>
+        c.classList.contains('full') ? 'full' :
+        c.classList.contains('half') ? 'half' : 'none'
+      );
       localStorage.setItem('circleStates', JSON.stringify(states));
     }
 
@@ -157,19 +158,13 @@
       const circles = document.querySelectorAll('.circle');
       circles.forEach((c, i) => {
         c.classList.remove('half', 'full');
-        if (states[i] === 'half') {
-          c.classList.add('half');
-        } else if (states[i] === 'full') {
-          c.classList.add('full');
-        }
+        if (states[i] === 'half') c.classList.add('half');
+        if (states[i] === 'full') c.classList.add('full');
       });
     }
 
     function resetCercles() {
-      const allCircles = document.querySelectorAll('.circle');
-      allCircles.forEach(c => {
-        c.classList.remove('half', 'full');
-      });
+      document.querySelectorAll('.circle').forEach(c => c.classList.remove('half', 'full'));
       localStorage.removeItem('circleStates');
       afficherSelections();
     }
@@ -184,62 +179,51 @@
 
   <h1>Choisissez les portions</h1>
 
-  <!-- Protéines -->
+  <!-- Catégories -->
   <div class="category" id="proteines">
-    <div>
-      <h2><span class="icon">🥩</span> Protéines</h2>
-      <div class="circle-container">
-        <div class="circle proteine" onclick="toggleCircleState(this)"></div>
-        <div class="circle proteine" onclick="toggleCircleState(this)"></div>
-        <div class="circle proteine" onclick="toggleCircleState(this)"></div>
-        <div class="circle proteine" onclick="toggleCircleState(this)"></div>
-      </div>
+    <h2><span class="icon">🥩</span> Protéines</h2>
+    <div class="circle-container">
+      <div class="circle proteine" onclick="toggleCircleState(this)"></div>
+      <div class="circle proteine" onclick="toggleCircleState(this)"></div>
+      <div class="circle proteine" onclick="toggleCircleState(this)"></div>
+      <div class="circle proteine" onclick="toggleCircleState(this)"></div>
     </div>
-    <span class="category-summary">0 portions</span>
+    <div class="category-summary">0 portions</div>
   </div>
 
-  <!-- Glucides -->
   <div class="category" id="glucides">
-    <div>
-      <h2><span class="icon">🍞</span> Glucides</h2>
-      <div class="circle-container">
-        <div class="circle glucide" onclick="toggleCircleState(this)"></div>
-        <div class="circle glucide" onclick="toggleCircleState(this)"></div>
-        <div class="circle glucide" onclick="toggleCircleState(this)"></div>
-        <div class="circle glucide" onclick="toggleCircleState(this)"></div>
-      </div>
+    <h2><span class="icon">🍞</span> Glucides</h2>
+    <div class="circle-container">
+      <div class="circle glucide" onclick="toggleCircleState(this)"></div>
+      <div class="circle glucide" onclick="toggleCircleState(this)"></div>
+      <div class="circle glucide" onclick="toggleCircleState(this)"></div>
+      <div class="circle glucide" onclick="toggleCircleState(this)"></div>
     </div>
-    <span class="category-summary">0 portions</span>
+    <div class="category-summary">0 portions</div>
   </div>
 
-  <!-- Lipides -->
   <div class="category" id="lipides">
-    <div>
-      <h2><span class="icon">🥜</span> Lipides</h2>
-      <div class="circle-container">
-        <div class="circle lipide" onclick="toggleCircleState(this)"></div>
-        <div class="circle lipide" onclick="toggleCircleState(this)"></div>
-        <div class="circle lipide" onclick="toggleCircleState(this)"></div>
-        <div class="circle lipide" onclick="toggleCircleState(this)"></div>
-      </div>
+    <h2><span class="icon">🥜</span> Lipides</h2>
+    <div class="circle-container">
+      <div class="circle lipide" onclick="toggleCircleState(this)"></div>
+      <div class="circle lipide" onclick="toggleCircleState(this)"></div>
+      <div class="circle lipide" onclick="toggleCircleState(this)"></div>
+      <div class="circle lipide" onclick="toggleCircleState(this)"></div>
     </div>
-    <span class="category-summary">0 portions</span>
+    <div class="category-summary">0 portions</div>
   </div>
 
-  <!-- Légumes -->
   <div class="category" id="legumes">
-    <div>
-      <h2><span class="icon">🥗</span> Légumes</h2>
-      <div class="circle-container">
-        <div class="circle legume" onclick="toggleCircleState(this)"></div>
-        <div class="circle legume" onclick="toggleCircleState(this)"></div>
-        <div class="circle legume" onclick="toggleCircleState(this)"></div>
-        <div class="circle legume" onclick="toggleCircleState(this)"></div>
-        <div class="circle legume" onclick="toggleCircleState(this)"></div>
-        <div class="circle legume" onclick="toggleCircleState(this)"></div>
-      </div>
+    <h2><span class="icon">🥗</span> Légumes</h2>
+    <div class="circle-container">
+      <div class="circle legume" onclick="toggleCircleState(this)"></div>
+      <div class="circle legume" onclick="toggleCircleState(this)"></div>
+      <div class="circle legume" onclick="toggleCircleState(this)"></div>
+      <div class="circle legume" onclick="toggleCircleState(this)"></div>
+      <div class="circle legume" onclick="toggleCircleState(this)"></div>
+      <div class="circle legume" onclick="toggleCircleState(this)"></div>
     </div>
-    <span class="category-summary">0 portions</span>
+    <div class="category-summary">0 portions</div>
   </div>
 
   <button onclick="resetCercles()">Réinitialiser</button>
